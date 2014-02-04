@@ -21,6 +21,8 @@
 
 @property (assign, nonatomic) BOOL toolbarPreviouslyHidden;
 
+@property (assign, getter = isLoading) BOOL loading;
+
 @end
 
 @implementation PBWebViewController
@@ -189,7 +191,7 @@
     self.forwardButton.enabled = self.webView.canGoForward;
     
     NSMutableArray *toolbarItems = [self.toolbarItems mutableCopy];
-    if (self.webView.loading) {
+    if (self.isLoading) {
         toolbarItems[0] = self.stopLoadingButton;
     } else {
         toolbarItems[0] = self.reloadButton;
@@ -241,12 +243,14 @@
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
+    self.loading = YES;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [self toggleState];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
+    self.loading = NO;
     [self finishLoad];
     self.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
     self.URL = self.webView.request.URL;
